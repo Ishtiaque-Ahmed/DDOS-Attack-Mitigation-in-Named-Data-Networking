@@ -1,0 +1,84 @@
+# topo-load-balancer.txt
+
+#
+#                          /-----\
+#                          | ABC |
+#                 XYZ----->  | HUB |  <----+
+#                 |        \-----/       |
+#                 |                      |  1Mbps/10ms delay
+#                 v                      v
+#               /------\               /----------\
+#               | PQR |                | Consumer |
+#               | HUB  |               |   ABC-1  |
+#       +-----> \------/ <-----+       \----------/
+#       |                      |
+#       |                      |
+#       v                      v
+#   /----------\           /----------\
+#   | Producer |           | Producer |
+#   |  PQR-1  |           |  PQR-2  |
+#   \----------/           \----------/
+#
+
+# any empty lines and lines starting with '#' symbol is ignored
+#
+# The file should contain exactly two sections: router and link, each starting with the corresponding keyword
+#
+# router section defines topology nodes and their relative positions (e.g., to use in visualizer)
+router
+
+# each line in this section represents one router and should have the following data
+# node   comment    yPos    xPos
+x1       NA         4       8
+x2       NA         7       7
+x3       NA         0       10
+x4       NA         10      10
+x5       NA         10      6
+x6       NA         2       6
+x7       NA         8       4
+x8       NA         5       4
+x9       NA         6       2
+x10	 NA	    8       11
+x17	 NA	    8       5
+x15	 NA	    8       20
+pr1	 NA	    6	   7
+pr2	 NA	    6	   8
+pr3	 NA	    6	   9
+pr4	 NA	    6	   10
+pr5	 NA	    6	   11
+pr6	 NA	    6	   12
+pr7	 NA	    6	   13
+pr8	 NA	    6	   14
+pr9	 NA	    6	   15
+pr10	 NA	    6	   16
+
+# Note that `node` can be any string. It is possible to access to the node by name using Names::Find, see examples.
+
+# link section defines point-to-point links between nodes and characteristics of these links
+link
+
+# Each line should be in the following format (only first two are required, the rest can be omitted)
+# srcNode   dstNode     bandwidth   metric  delay   queue
+# bandwidth: link bandwidth
+# metric: routing metric
+# delay:  link delay
+# queue:  MaxPackets for transmission queue on the link (both directions)
+x1   x2 1Mbps       1       10ms    10
+x1   x6 1Mbps       1       10ms    10
+pr2   x1 .25Mbps       1       10ms    10
+x2   x4 1Mbps       1       10ms    10
+x2   x5 1Mbps       1       10ms    10
+x2   x7 1Mbps       1       10ms    10
+x6   x8 1Mbps       1       10ms    10
+x8   x9 1Mbps       1       10ms    10
+pr1  x1 .25Mbps       1       10ms    10
+x17   x9 1Mbps	    1 	    10ms    10
+pr3   x1 .25Mbps	    1 	    10ms    10 
+x5    x4 1Mbps	    1 	    10ms    10
+pr4  x1 .25Mbps       1       10ms    10
+pr5  x1 .25Mbps       1       10ms    10
+pr6  x1 .25Mbps       1       10ms    10
+pr7  x1 .25Mbps       1       10ms    10
+pr8  x1 .25Mbps       1       10ms    10
+pr9  x1 .25Mbps       1       10ms    10
+pr10  x1 .25Mbps       1       10ms    10
