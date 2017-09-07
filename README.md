@@ -1,1 +1,1 @@
-# DDOS-Attack-Mitigation-for-dynamic-producers-in-Named-Data-Networking
+# DDOS-Attack-Mitigation-for-dynamic-content-producers-in-Named-Data-Networking
