@@ -44,10 +44,13 @@ public:
   virtual void
   afterReceiveInterest(const Face& inFace, const Interest& interest,
                        const shared_ptr<pit::Entry>& pitEntry) override;
+
    int usage[100];
    int no_of_producers;
-   std::map<std::string,int>in_record;
+   std::map<std::string,int>max_limit;
    std::map<std::string,int>data_record;
+   std::map<std::string,int>safe_interest;
+   std::map<std::string,int>malicious_interest;
 
 public:
   static const Name STRATEGY_NAME;

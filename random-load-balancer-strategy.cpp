@@ -34,6 +34,7 @@
 #include <vector>
 #include <cstdlib>
 #include <stdio.h>
+#include <ctime>
 
 #include <iostream>
 
@@ -41,7 +42,7 @@ NFD_LOG_INIT("RandomLoadBalancerStrategy");
 
 namespace nfd {
 namespace fw {
-
+//void get_malicious_links();
 const Name
   RandomLoadBalancerStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/random-load-balancer");
 
@@ -49,28 +50,55 @@ RandomLoadBalancerStrategy::RandomLoadBalancerStrategy(Forwarder& forwarder, con
   : Strategy(forwarder, name)
 
   {
-    {
+        {
 
-   using namespace std;
-   freopen("src/ndnSIM/examples/weight.txt","r",stdin);
-   int n,k;k=0;
-   while(cin>>n)
-    {
-        cout<<n<<endl;
-        k++;
-    }
-    no_of_producers=k;
+           using namespace std;
+           freopen("src/ndnSIM/examples/weight.txt","r",stdin);
+           int n,k;k=0;
+               while(cin>>n)
+                {
+                    cout<<n<<endl;
+                    k++;
+                }
+                no_of_producers=k;
 
-    for(int i=0;i<=k;i++)
-    {
-        usage[i]=0;
-    }
+                for(int i=0;i<=k;i++)
+                {
+                    usage[i]=0;
+                }
 
-   }
+
+        ifstream myfile;
+        myfile.open("src/ndnSIM/examples/safe_links.txt");
+        std::string link;
+        int limit;
+        while(myfile>>link>>limit)
+        {
+            safe_interest[link]=0;
+            max_limit[link]=limit;
+        }
+        cout<<"printing malicious links "<<endl;
+        for(auto it=safe_interest.begin();it!=safe_interest.end();it++)
+        {
+            cout<<it->first<<" "<<it->second<<endl;
+
+        }
+
+                //get_malicious_links();
+
+       }
 }
+
 
 RandomLoadBalancerStrategy::~RandomLoadBalancerStrategy()
 {
+}
+
+bool is_safe_interest(string link)
+{
+
+
+
 }
 
 static bool
@@ -131,6 +159,11 @@ vector<int>get_weight()
         //cout<<"start "<<start<<endl;
         start++;
     }
+
+     random_device rd;
+    mt19937 g(rd());
+    shuffle(producer_index.begin(), producer_index.end(), g);
+
    // myfile.close();
     return producer_index;
     }
@@ -151,8 +184,31 @@ RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Inter
 
   NFD_LOG_TRACE("afterReceiveInterest");
     std::string s=pitEntry.get()->getName().toUri();
-    s=extract_interest_name(s);
-    std::cout<<"interest name  "<<s<<"\n";
+    std::string link=extract_interest_name(s);
+    std::cout<<"interest name  "<<link<<"\n";
+
+
+
+    auto it=safe_interest.find(link);
+    if(it==safe_interest.end())
+    {
+        auto it1=malicious_interest.find(link);
+        if(it1==malicious_interest.end())
+        {
+            malicious_interest[link]=0;
+        }
+        else
+        {
+            malicious_interest[link]+=1;
+        }
+    this->rejectPendingInterest(pitEntry);
+    return;
+
+
+    }
+    safe_interest[link]+=1;
+
+
     //int it=pitEntry.get()->getInRecords().size();
     //std::cout<<"pit "<<it<<"\n";
    // std::cout<<"no of machine 0 "<<get_count<<"\n";
@@ -190,7 +246,7 @@ RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Inter
     std::cout<<"now selected :  "<<randomIndex<<"\n";
     usage[randomIndex]+=1;
 
-    for(int i=0;i<=no_of_producers;i++)
+    for(int i=0;i<no_of_producers;i++)
     {
         cout<<"producer no : "<<i+1<<" usage : "<<usage[i]<<"\n";
     }
